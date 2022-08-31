@@ -1,27 +1,32 @@
 #ifndef STRING_GENERATOR_HPP
 #define STRING_GENERATOR_HPP
 
-#include <string>
-#include <vector>
+#include <cstdint>
 
 class StringGenerator {
-  private:
-    unsigned int str_len;
-    unsigned int lookup_size;
-    std::vector< unsigned int > indices;
-    std::string lookup;
+  protected:
     bool end;
+    char* buffer;
+    uint32_t max_length;
 
-  std::string convertToString();
+    virtual void incrementState() = 0;
+    virtual void fillBuffer() = 0;
+    virtual void resetState() = 0;
 
-  void increment();
+    void setEnd();
 
   public:
-    StringGenerator( unsigned int len, std::string alphabet );
+    StringGenerator( const uint32_t max_str_length );
+    virtual ~StringGenerator();
 
-    std::string getNext();
+    const uint32_t getMaxLength() const;
 
-    bool isEnd();
+    const char* get() const;
+    void advance();
+
+    const bool isEnd() const;
+
+    void reset();
 };
 
 #endif

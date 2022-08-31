@@ -1,59 +1,49 @@
+#include <cstring>
+
 #include "StringGenerator.hpp"
 
-StringGenerator::StringGenerator( unsigned int len, std::string alphabet ) :
-  str_len( len ),
-  indices( len, 0 ),
-  lookup( alphabet ),
-  lookup_size( alphabet.length() ),
-  end( false ) {
-  if( len == 0 ) {
-    end = true;
+StringGenerator::StringGenerator( const uint32_t max_str_length ) :
+  end( false ),
+  max_length( max_str_length ),
+  buffer( nullptr ) {
+  if( max_length == 0 ) {
+    setEnd();
+  } else {
+    buffer = new char[ max_length+1 ];
+    std::memset( buffer, 0x00, max_length+1 );
   }
 }
 
-std::string StringGenerator::convertToString() {
-  std::string out = "";
-  for( unsigned int i = 0; i < str_len; ++i ) {
-    out += lookup[indices[i]];
+StringGenerator::~StringGenerator() {
+  if( buffer ) {
+    delete[] buffer;
   }
-  return out;
 }
 
-std::string StringGenerator::getNext() {
-  if( isEnd() ) {
-    return std::string( "" );
-  }
-
-  std::string out = convertToString();
-  increment();
-  return out;
+const uint32_t StringGenerator::getMaxLength() const {
+  return max_length;
 }
 
-void StringGenerator::increment() {
-  if( end ) {
-    return;
-  }
-
-  bool inc = false;
-  unsigned int index = str_len-1;
-  do {
-    ++indices[ index ];
-      
-    inc = ( indices[ index ] >= lookup_size );
-    if( inc ) {
-      indices[ index ] = indices[ index ] % lookup_size;
-       
-      end = ( index == 0 );
-      if( end ) {
-        return;
-      }
-
-      --index;
-    }
-  } while( inc && index >= 0 );
+const char* StringGenerator::get() const {
+  return buffer;
 }
 
-bool StringGenerator::isEnd() {
+void StringGenerator::advance() {
+  incrementState();
+  fillBuffer();
+}
+
+const bool StringGenerator::isEnd() const {
   return end;
+}
+
+void StringGenerator::reset() {
+  resetState();
+  end = false;
+  fillBuffer();
+}
+
+void StringGenerator::setEnd() {
+  end = true;
 }
 
