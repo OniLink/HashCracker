@@ -179,6 +179,11 @@ void FullStringGenerator::fillBuffer() {
   for( uint32_t i = 0; i < subgen_count; ++i ) {
     const char* next = subgen[ i ]->get();
     uint32_t write_length = std::strlen( next );
+    write_length = (
+      write_pos + write_length >= max_length ?
+      max_length - write_pos :
+      write_length
+    );
     std::memcpy( buffer + write_pos, next, write_length );
     write_pos += write_length;
   }
