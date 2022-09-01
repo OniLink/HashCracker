@@ -87,6 +87,35 @@ FullStringGenerator::FullStringGenerator(
       subgenerators.emplace_back(
         new DictStringGenerator( dictionary, max_length )
       );
+    } else if( format[ i ] == 'l' ) {
+      // Literal
+      // Get literal
+      uint32_t sub_start = format.find_first_of( '[', i );
+      uint32_t sub_end = format.find_first_of( ']', i );
+      
+      // Validate range
+      if( sub_start == std::string::npos ||
+          sub_end == std::string::npos ||
+          sub_start != i+1 ||
+          sub_end < sub_start ) {
+        std::cerr << "ERROR: Unable to process literal in '"
+                  << format.substr( i )
+                  << "'."
+                  << std::endl;
+        continue;
+      }
+
+      // Parse
+      uint32_t sub_length = sub_end - sub_start - 1;
+      std::string literal = format.substr( sub_start+1, sub_length );
+      subgenerators.emplace_back(
+        new DictStringGenerator(
+          std::vector< std::string >{ literal },
+          literal.length()
+        )
+      );
+
+      i = sub_end;
     } else if( format[ i ] == 'r' ) {
       // Random
       // Get subformat
