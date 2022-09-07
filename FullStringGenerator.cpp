@@ -141,7 +141,7 @@ FullStringGenerator::FullStringGenerator(
       uint32_t length = 0;
       
       // Create the generator
-      if( parseRNGFormat( subformat, alphabet, length ) ) {
+      if( parseRNGFormat( subformat, alphabet, length ) && length > 0 ) {
         subgenerators.emplace_back(
           new RNGStringGenerator( alphabet, length )
         );
